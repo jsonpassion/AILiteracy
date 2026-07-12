@@ -352,28 +352,26 @@ import { C, EASE_OUT, EASE_BOTH, kf, an, st, rect, ellipse, fill, strokeShape, p
     shapes: [group([rect(w2[i], 26, 13), fill(C.cardLight)])],
   }));
 
-  // 운율 연결: 두 핑크 단어를 오른쪽에서 묶는 브래킷 "]" — "이 둘은 운율이 맞다"
-  const w1r = x1[3] + w1[3] / 2, w2r = x2[3] + w2[3] / 2; // 두 단어의 오른쪽 끝
-  const bx = Math.max(w1r, w2r) + 30;                     // 브래킷 세로선 x
-  const rhymeBracket = layer({
-    nm: "rhyme-bracket", ind: 13, ip: 0, op: OP, o: fadeInOut(160, 486, 16),
+  // 앞을 내다보는 화살표: 2행 시작점에서 호를 그려 끝의 운율 단어로 도달
+  //  — "문장을 쓰기 전에 끝의 운율 단어를 먼저 정해 두고 거기에 도달한다"는 계획성을 직접 표현
+  const startX = x2[0] - w2[0] / 2 - 6;    // 2행 왼쪽 시작점
+  const endX = x2[3];                       // 운율 단어 x
+  const arcPts = [
+    [startX, L2Y - 2], [startX + 40, L2Y - 40], [startX + 100, L2Y - 66],
+    [startX + 170, L2Y - 74], [endX - 46, L2Y - 66], [endX - 12, L2Y - 42],
+    [endX, L2Y - 26], [endX, L2Y - 18],
+  ];
+  const lookAhead = layer({
+    nm: "lookahead-arc", ind: 13, ip: 0, op: OP, o: fadeInOut(150, 486, 18),
     shapes: [
-      // 세로선
-      group([rect(3, (L2Y - L1Y) + 30, 1.5), fill(C.pink, 78)], { x: bx, y: (L1Y + L2Y) / 2 }),
-      // 위/아래 가로 tick (각 단어 오른쪽 끝 → 세로선)
-      group([rect(bx - w1r + 4, 3, 1.5), fill(C.pink, 78)], { x: (w1r + bx) / 2, y: L1Y }),
-      group([rect(bx - w2r + 4, 3, 1.5), fill(C.pink, 78)], { x: (w2r + bx) / 2, y: L2Y }),
+      group([path(arcPts), strokeShape(C.pink, 3.5, 85)]),
+      group([ellipse(9), fill(C.pink, 90)], { x: startX, y: L2Y - 2 }), // 시작점 앵커
     ],
   });
-  // 운율 라벨: ♪ 음표 (머리 + 대 + 깃발)
-  const note = layer({
-    nm: "rhyme-note", ind: 14, ip: 0, op: OP, p: st([bx + 26, (L1Y + L2Y) / 2, 0]), s: popIn(200, 16, 120),
-    o: fadeInOut(200, 480, 16),
-    shapes: [
-      group([ellipse(15, 11), fill(C.pink, 92)], { x: -6, y: 9, r: -22 }),
-      group([rect(3, 30, 1.5), fill(C.pink, 92)], { x: 1, y: -3 }),
-      group([rect(11, 3.5, 1.75), fill(C.pink, 92)], { x: 6, y: -18, r: 18 }),
-    ],
+  const lookHead = layer({
+    nm: "lookahead-head", ind: 14, ip: 0, op: OP, p: st([endX, L2Y - 12, 0]), s: popIn(176, 14, 122),
+    o: fadeInOut(150, 486, 18),
+    shapes: [group([tri(9), fill(C.pink, 92)], { r: 180 })], // 운율 단어를 향해 아래로
   });
 
   // 생각 배지: 좌상단 전구 느낌 (원 + 광선 4개)
@@ -386,5 +384,5 @@ import { C, EASE_OUT, EASE_BOTH, kf, an, st, rect, ellipse, fill, strokeShape, p
     ],
   });
 
-  save("thought-planning.json", doc("thought-planning", W, H, OP, [...line1, ...slots, rhyme, ...fillers, rhymeBracket, note, idea]));
+  save("thought-planning.json", doc("thought-planning", W, H, OP, [...line1, ...slots, rhyme, ...fillers, lookAhead, lookHead, idea]));
 }
