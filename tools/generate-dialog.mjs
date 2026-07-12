@@ -114,13 +114,12 @@ import { C, EASE_OUT, EASE_BOTH, kf, an, st, rect, ellipse, fill, strokeShape, p
 
   const fadeAll = an([kf(0, 100, EASE_BOTH), kf(528, 100, EASE_BOTH), kf(556, 0)]);
 
-  // 문서 프레임 + 접힌 모서리
+  // 문서 프레임 (접힌 모서리 삼각형은 노이즈로 보여 제거)
   const docFrame = layer({
     nm: "doc", ind: 1, ip: 0, op: OP, p: st([DOCX, DOCY, 0]), s: popIn(6, 16), o: fadeAll,
     shapes: [
       group([rect(190, 232, 18), fill(C.card, 45)]),
       group([rect(190, 232, 18), strokeShape(C.slate, 2.5, 55)], {}, null, pulse(300, 36, 104)),
-      group([path([[0, 0], [26, 0], [0, 26]], true), fill(C.slate, 45)], { x: 95 - 14, y: -116 + 14, r: 180 }),
     ],
   });
 

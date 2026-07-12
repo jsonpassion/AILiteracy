@@ -352,17 +352,28 @@ import { C, EASE_OUT, EASE_BOTH, kf, an, st, rect, ellipse, fill, strokeShape, p
     shapes: [group([rect(w2[i], 26, 13), fill(C.cardLight)])],
   }));
 
-  // 운율 연결: 세로 대시 라인 (1행 끝 ↔ 2행 끝)
-  const linkX = Math.max(x1[3], x2[3]) + 58;
-  const rhymeLink = layer({
-    nm: "rhyme-link", ind: 13, ip: 0, op: OP, p: st([linkX, (L1Y + L2Y) / 2, 0]), r: st(90),
-    o: fadeInOut(150, 480, 16),
-    shapes: [group(dashedLine(74, 4, C.pink, 3.5, 70))],
+  // 운율 연결: 두 핑크 단어를 오른쪽에서 묶는 브래킷 "]" — "이 둘은 운율이 맞다"
+  const w1r = x1[3] + w1[3] / 2, w2r = x2[3] + w2[3] / 2; // 두 단어의 오른쪽 끝
+  const bx = Math.max(w1r, w2r) + 30;                     // 브래킷 세로선 x
+  const rhymeBracket = layer({
+    nm: "rhyme-bracket", ind: 13, ip: 0, op: OP, o: fadeInOut(160, 486, 16),
+    shapes: [
+      // 세로선
+      group([rect(3, (L2Y - L1Y) + 30, 1.5), fill(C.pink, 78)], { x: bx, y: (L1Y + L2Y) / 2 }),
+      // 위/아래 가로 tick (각 단어 오른쪽 끝 → 세로선)
+      group([rect(bx - w1r + 4, 3, 1.5), fill(C.pink, 78)], { x: (w1r + bx) / 2, y: L1Y }),
+      group([rect(bx - w2r + 4, 3, 1.5), fill(C.pink, 78)], { x: (w2r + bx) / 2, y: L2Y }),
+    ],
   });
-  // 연결 라벨: 물결 표시 대신 상하 화살촉
-  const capTop = layer({
-    nm: "cap-top", ind: 14, ip: 0, op: OP, p: st([linkX, L1Y + 22, 0]), o: fadeInOut(150, 480, 16),
-    shapes: [group([tri(7), fill(C.pink, 70)])],
+  // 운율 라벨: ♪ 음표 (머리 + 대 + 깃발)
+  const note = layer({
+    nm: "rhyme-note", ind: 14, ip: 0, op: OP, p: st([bx + 26, (L1Y + L2Y) / 2, 0]), s: popIn(200, 16, 120),
+    o: fadeInOut(200, 480, 16),
+    shapes: [
+      group([ellipse(15, 11), fill(C.pink, 92)], { x: -6, y: 9, r: -22 }),
+      group([rect(3, 30, 1.5), fill(C.pink, 92)], { x: 1, y: -3 }),
+      group([rect(11, 3.5, 1.75), fill(C.pink, 92)], { x: 6, y: -18, r: 18 }),
+    ],
   });
 
   // 생각 배지: 좌상단 전구 느낌 (원 + 광선 4개)
@@ -375,5 +386,5 @@ import { C, EASE_OUT, EASE_BOTH, kf, an, st, rect, ellipse, fill, strokeShape, p
     ],
   });
 
-  save("thought-planning.json", doc("thought-planning", W, H, OP, [...line1, ...slots, rhyme, ...fillers, rhymeLink, capTop, idea]));
+  save("thought-planning.json", doc("thought-planning", W, H, OP, [...line1, ...slots, rhyme, ...fillers, rhymeBracket, note, idea]));
 }

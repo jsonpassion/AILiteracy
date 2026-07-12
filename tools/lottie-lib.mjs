@@ -54,13 +54,17 @@ export const group = (items, { x = 0, y = 0, r = 0, s = [100, 100], o = 100 } = 
     { ty: "tr", p: pAnim || st([x, y]), a: st([0, 0]), s: sAnim || st(s), r: rAnim || st(r), o: oAnim || st(o), sk: st(0), sa: st(0) },
   ],
 });
+/* z-순서 규칙: lottie SVG는 배열의 '첫' 항목을 맨 앞(위)에 그린다(레이어·그룹 모두).
+   이 생성기들은 직관적으로 "배경 먼저 → 전경 나중" 순으로 작성했으므로, 최종 출력 직전에
+   레이어 배열과 각 레이어의 shapes 배열을 뒤집어 준다. 그러면 전경(움직이는 요소)이 앞,
+   배경이 뒤로 와 의도한 위계가 된다. (parenting 미사용이라 배열 뒤집기가 안전하다.) */
 export const layer = ({ nm, ind, shapes, p, s, r, o, a = [0, 0, 0], ip = 0, op, stt = 0 }) => ({
   ddd: 0, ind, ty: 4, nm, sr: 1,
   ks: { o: o ?? st(100), r: r ?? st(0), p: p ?? st([0, 0, 0]), a: st(a), s: s ?? st([100, 100, 100]) },
-  ao: 0, shapes, ip, op, st: stt, bm: 0,
+  ao: 0, shapes: shapes.slice().reverse(), ip, op, st: stt, bm: 0,
 });
 export const doc = (nm, w, h, op, layers) => ({
-  v: "5.7.4", fr: 60, ip: 0, op, w, h, nm, ddd: 0, assets: [], layers,
+  v: "5.7.4", fr: 60, ip: 0, op, w, h, nm, ddd: 0, assets: [], layers: layers.slice().reverse(),
 });
 
 /* 팝인(스케일 오버슈트) · 페이드 */
